@@ -2,12 +2,12 @@ import json
 import logging
 import re
 import time
-import slackbot.utils.plugins
+import slackrobot.utils.plugins
 from collections import OrderedDict
 from slackclient import SlackClient
-from slackbot.utils.thread import ThreadPoolExecutor as Pool
+from slackrobot.utils.thread import ThreadPoolExecutor as Pool
 
-class SlackBot(object):
+class SlackRobot(object):
     def __init__(self, token, max_workers=8):
         self.bot_id = None
         self.bot_name = None
@@ -20,10 +20,10 @@ class SlackBot(object):
     
     def _load_plugins(self):
         # load cron plugins
-        for cron_plugin in slackbot.utils.plugins.cron_loader.all():
+        for cron_plugin in slackrobot.utils.plugins.cron_loader.all():
             self.cron_plugins.append(cron_plugin)
         # load plugins
-        for plugin in slackbot.utils.plugins.loader.all():
+        for plugin in slackrobot.utils.plugins.loader.all():
             self.plugins.append(plugin) 
  
     def connect(self):
