@@ -4,7 +4,7 @@ setup(
     name='slackrobot',
     version='0.1.0',
     description='Simple python implementation of slack bot',
-    url='',
+    url='https://github.com/traveloka/python-slackrobot',
     author='Ricky Winata',
     author_email='ricky.w12@gmail.com',
     license='MIT',
