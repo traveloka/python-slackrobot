@@ -14,8 +14,8 @@ class SlackRobot(object):
         self.last_ping = 0
         self.cron_plugins = []
         self.plugins = []
+        self.slack_client = SlackClient(token)
         self._load_plugins()
-        self._slack_client = SlackClient(token)
         self._executor = Pool(max_workers=max_workers)
     
     def _load_plugins(self):
@@ -28,15 +28,15 @@ class SlackRobot(object):
  
     def connect(self):
         logging.info('Trying to connect with Slack...')
-        self._slack_client.rtm_connect()
-        self.bot_id = self._slack_client.server.login_data['self']['id']
-        self.bot_name = self._slack_client.server.login_data['self']['name']
+        self.slack_client.rtm_connect()
+        self.bot_id = self.slack_client.server.login_data['self']['id']
+        self.bot_name = self.slack_client.server.login_data['self']['name']
         logging.info('Connected with bot name @{}'.format(self.bot_name))
 
     def start(self):
         self.connect()
         while True:
-            for reply in self._slack_client.rtm_read():
+            for reply in self.slack_client.rtm_read():
                 self.input(reply)
             self.crons()
             self.autoping()
@@ -45,7 +45,7 @@ class SlackRobot(object):
     def autoping(self):
         now = int(time.time())
         if now > self.last_ping + 3:
-            self._slack_client.server.ping()
+            self.slack_client.server.ping()
             self.last_ping = now
     
     def input(self, data):
@@ -77,7 +77,7 @@ class SlackRobot(object):
             'attachments': json.dumps(attachments),
             'as_user': True }
         logging.info('Send message {} ...'.format(send_data))
-        message = json.loads(self._slack_client.api_call('chat.postMessage', **send_data))
+        message = json.loads(self.slack_client.api_call('chat.postMessage', **send_data))
         if not message['ok']:
             logging.info('send_message failed: ' + message['error'])
         return message
@@ -89,7 +89,7 @@ class SlackRobot(object):
                 'ts': message['ts'],
                 'channel': message['channel'] }
             logging.info('Update message {} ...'.format(update_data))
-            new_message = json.loads(self._slack_client.api_call('chat.update', **update_data))
+            new_message = json.loads(self.slack_client.api_call('chat.update', **update_data))
             if not new_message['ok']:
                 logging.info('update_message failed: ' + message['error'])
             return new_message
