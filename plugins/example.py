@@ -1,3 +1,3 @@
-def process_message(bot, data):
+def process_message(bot, message):
     print 'Hello World!'
     
