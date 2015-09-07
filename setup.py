@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='slackrobot',
-    version='0.1.1',
+    version='0.1.2',
     description='Simple python implementation of slack bot',
     url='https://github.com/traveloka/python-slackrobot',
     author='Ricky Winata',

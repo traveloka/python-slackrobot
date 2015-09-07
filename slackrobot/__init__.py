@@ -36,12 +36,18 @@ class SlackRobot(object):
     def start(self):
         self.connect()
         while True:
-            for reply in self.slack_client.rtm_read():
-                self.input(reply)
+            self.try_read_input()
             self.crons()
             self.autoping()
             time.sleep(.1)
     
+    def try_read_input(self):
+        try:
+            for reply in self.slack_client.rtm_read():
+                self.input(reply)
+        except Exception as e:
+            logging.warning('Exception: {}'.format(str(e)))
+
     def autoping(self):
         now = int(time.time())
         if now > self.last_ping + 3:
