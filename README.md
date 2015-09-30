@@ -9,12 +9,19 @@ pip install slackrobot
 ## Usage
 ```Python
 TOKEN = "YOUR BOT TOKEN HERE"
+
+# default, the plugins directory is in your current directory
 slackbot = SlackRobot(TOKEN)
+slackbot.start()
+
+# set plugins directory to your app directory
+import os
+slackbot = SlackRobot(TOKEN, plugins_directory=os.path.join(os.path.dirname(__file__), 'plugins'))
 slackbot.start()
 ```
 
 ## Plugins
-You need to add your plugins into folder ./plugins. (see the example in this repo)
+You need to add your plugins into your plugins directory. (see the example in this repo)
 There are 2 types of plugin: normal & cron.
 
 For a **normal plugin**, you need to have function `process_message(bot, message)` in your plugin file to process the message. Every message the bot receives will be spread to all plugins. 
