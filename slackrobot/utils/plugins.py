@@ -3,8 +3,8 @@ plugin utils for slack-robot
 """
 import imp
 import glob
-import sys
 import os
+import sys
 
 class Plugin(object): #pylint: disable-msg=R0903
     """Represents normal plugin"""
@@ -31,10 +31,10 @@ class PluginLoader(object): #pylint: disable-msg=R0903
     """
     A loader for loading normal plugins to slack bot
     """
-    def __init__(self, func_name, plugins_path):
+    def __init__(self, func_name, plugins_dir):
         self.func_name = func_name
-        self.plugins_path = plugins_path
-        sys.path.append(self.plugins_path)
+        self.plugins_dir = plugins_dir
+        sys.path.append(self.plugins_dir)
 
     def all(self):
         """Get all normal plugins
@@ -43,7 +43,7 @@ class PluginLoader(object): #pylint: disable-msg=R0903
             generator of all normal plugins
         """
 
-        for path in glob.glob(self.plugins_path+'/*.py'):
+        for path in glob.glob(self.plugins_dir+'/*.py'):
             name, _ = os.path.splitext(os.path.basename(path))
             if name.startswith('__'):
                 continue
@@ -56,8 +56,8 @@ class CronPluginLoader(PluginLoader): #pylint: disable-msg=R0903
     """
     A loader for loading all cron plugins to slack bot
     """
-    def __init__(self, func_name, interval_name, plugins_path):
-        super(CronPluginLoader, self).__init__(func_name, plugins_path)
+    def __init__(self, func_name, interval_name, plugins_dir):
+        super(CronPluginLoader, self).__init__(func_name, plugins_dir)
         self.interval_name = interval_name
 
     def all(self):
@@ -66,7 +66,7 @@ class CronPluginLoader(PluginLoader): #pylint: disable-msg=R0903
         Returns:
             generator of cron plugins
         """
-        for path in glob.glob(self.plugins_path+'/*.py'):
+        for path in glob.glob(self.plugins_dir+'/*.py'):
             name, _ = os.path.splitext(os.path.basename(path))
             if name.startswith('__'):
                 continue
@@ -75,13 +75,3 @@ class CronPluginLoader(PluginLoader): #pylint: disable-msg=R0903
                 yield CronPlugin(getattr(module, self.func_name),
                                  getattr(module, self.interval_name))
 
-LOADER = PluginLoader(
-    'process_message',
-    './plugins'
-)
-
-CRON_LOADER = CronPluginLoader(
-    'cron_job',
-    'cron_interval',
-    './plugins'
-)

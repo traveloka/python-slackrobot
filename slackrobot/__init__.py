@@ -19,25 +19,34 @@ class SlackRobot(object):
     - slack_client: for accessing slack api (SlackClient)
     - bot_id: bot id in slack, exist when bot connected to slack (string)
     - bot_name: bot name in slack, exist when bot connected to slack (string)
+    - plugin_dirs: plugins directory
     """
 
-    def __init__(self, token, max_workers=8):
+    def __init__(self, token, plugins_dir='./plugins', max_workers=8):
         self.bot_id = None
         self.bot_name = None
         self.last_ping = 0
+        self.plugins_dir = plugins_dir
         self.cron_plugins = []
         self.plugins = []
         self.slack_client = SlackClient(token)
-        self.load_plugins()
         self.executor = Pool(max_workers=max_workers)
+        self.load_plugins()
 
     def load_plugins(self):
         """Load plugins (normal & cron)"""
         # load cron plugins
-        for cron_plugin in slackrobot.utils.plugins.CRON_LOADER.all():
+        cron_loader = slackrobot.utils.plugins.CronPluginLoader(
+            'cron_job', 'cron_interval', self.plugins_dir
+        )
+        for cron_plugin in cron_loader.all():
             self.cron_plugins.append(cron_plugin)
-        # load plugins
-        for plugin in slackrobot.utils.plugins.LOADER.all():
+
+        # load normal plugins
+        loader = slackrobot.utils.plugins.PluginLoader(
+            'process_message', self.plugins_dir
+        )
+        for plugin in loader.all():
             self.plugins.append(plugin)
 
     def connect(self):
