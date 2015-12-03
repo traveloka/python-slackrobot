@@ -110,7 +110,7 @@ class SlackRobot(object):
                 cron_plugin.last_run = time.time()
                 self.executor.submit(cron_plugin.do_job, self)
 
-    def send_message(self, text, channel, attachments=None):
+    def send_message(self, text, channel, attachments=None, params=None):
         """Send text message to slack channel
 
         Args:
@@ -123,11 +123,13 @@ class SlackRobot(object):
             for more information https://api.slack.com/methods/chat.postMessage
         """
         attachments = attachments or []
+        params = params or {}
         send_data = {
             'text': text,
             'channel': channel,
             'attachments': json.dumps(attachments),
             'as_user': True}
+        send_data.update(params)
         logging.info('Send message %s ...', send_data)
         message = json.loads(self.slack_client.api_call('chat.postMessage', **send_data))
         if not message['ok']:
